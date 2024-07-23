@@ -5,44 +5,65 @@ const pauseBtn = document.getElementById('btn-pause');
 const resetBtn = document.getElementById('btn-reset');
 const session = document.querySelector('.minutes');
 let myInterval;
-let state = true;
+let totalSeconds;
+let isRunning = false;
+let originalMinutes = Number.parseInt(session.textContent);
 
-const appTimer = () => {
-    const sessionAmount = Number.parseInt(session.textContent);
+const updateDisplay = () => {
+    const minuteDiv = document.querySelector('.minutes');
+    const secondDiv = document.querySelector('.seconds');
 
-    if (state) {
-        state = false;
-        let totalSeconds = sessionAmount * 60;
+    let minutesLeft = Math.floor(totalSeconds / 60);
+    let secondsLeft = totalSeconds % 60;
 
-        const updateSeconds = () => {
-            const minuteDiv = document.querySelector('.minutes');
-            const secondDiv = document.querySelector('.seconds');
+    if (secondsLeft < 10) {
+        secondDiv.textContent = `0${secondsLeft}`;
+    } else {
+        secondDiv.textContent = `${secondsLeft}`;
+    }
+    minuteDiv.textContent = `${minutesLeft}`;
+}
 
+const startTimer = () => {
+    if (!isRunning) {
+        isRunning = true;
+        totalSeconds = Number.parseInt(session.textContent) * 60;
+        waves.loop = true;
+        waves.play();
+
+        myInterval = setInterval(() => {
             totalSeconds--;
 
-            let minutesLeft = Math.floor(totalSeconds / 60);
-            let secondsLeft = totalSeconds % 60;
-
-            if (secondsLeft < 10) {
-                secondDiv.textContent = `0${secondsLeft}`;
-            } else {
-                secondDiv.textContent = `${secondsLeft}`;
-            }
-            minuteDiv.textContent = `${minutesLeft}`;
-
-            if (totalSeconds > 0) {
-                waves.play();
+            if (totalSeconds >= 0) {
+                updateDisplay();
             } else {
                 alarm.play();
                 clearInterval(myInterval);
-                state = true;  // Reset state when timer finishes
+                isRunning = false;
+                waves.pause();
+                waves.currentTime = 0;
             }
-        }
-        updateSeconds();  // Immediately update the display
-        myInterval = setInterval(updateSeconds, 1000);
-    } else {
-        alert('Timer is already running');
+        }, 1000);
     }
 }
 
-startBtn.addEventListener('click', appTimer);
+const pauseTimer = () => {
+    if (isRunning) {
+        clearInterval(myInterval);
+        isRunning = false;
+        waves.pause();
+    }
+}
+
+const resetTimer = () => {
+    clearInterval(myInterval);
+    isRunning = false;
+    totalSeconds = originalMinutes * 60;
+    updateDisplay();
+    waves.pause();
+    waves.currentTime = 0;
+}
+
+startBtn.addEventListener('click', startTimer);
+pauseBtn.addEventListener('click', pauseTimer);
+resetBtn.addEventListener('click', resetTimer);
