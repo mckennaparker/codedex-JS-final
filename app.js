@@ -28,8 +28,6 @@ const startTimer = () => {
     if (!isRunning) {
         isRunning = true;
         totalSeconds = Number.parseInt(session.textContent) * 60;
-        waves.loop = true;
-        waves.play();
 
         myInterval = setInterval(() => {
             totalSeconds--;
@@ -37,11 +35,8 @@ const startTimer = () => {
             if (totalSeconds >= 0) {
                 updateDisplay();
             } else {
-                alarm.play();
                 clearInterval(myInterval);
                 isRunning = false;
-                waves.pause();
-                waves.currentTime = 0;
             }
         }, 1000);
     }
@@ -51,7 +46,6 @@ const pauseTimer = () => {
     if (isRunning) {
         clearInterval(myInterval);
         isRunning = false;
-        waves.pause();
     }
 }
 
@@ -60,8 +54,6 @@ const resetTimer = () => {
     isRunning = false;
     totalSeconds = originalMinutes * 60;
     updateDisplay();
-    waves.pause();
-    waves.currentTime = 0;
 }
 
 startBtn.addEventListener('click', startTimer);
